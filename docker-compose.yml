@@ -1,0 +1,64 @@
+# Локальный запуск: PostgreSQL + API + админ-панель
+#   cp .env.example .env
+#   docker compose up -d --build
+# Мобильное приложение запускается на компьютере: pnpm dev:mobile
+
+name: kirilovskiy
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-kirilovskiy}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-kirilovskiy}
+      POSTGRES_DB: ${POSTGRES_DB:-kirilovskiy}
+      TZ: Europe/Moscow
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  api:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    restart: unless-stopped
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      NODE_ENV: ${NODE_ENV:-development}
+      DATABASE_URL: postgresql://${POSTGRES_USER:-kirilovskiy}:${POSTGRES_PASSWORD:-kirilovskiy}@postgres:5432/${POSTGRES_DB:-kirilovskiy}?schema=public
+      API_PORT: 4000
+      UPLOADS_DIR: /repo/apps/api/uploads
+      SEED_ON_START: ${SEED_ON_START:-true}
+    ports:
+      - "${API_PORT:-4000}:4000"
+    volumes:
+      - uploads:/repo/apps/api/uploads
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  admin:
+    build:
+      context: .
+      dockerfile: apps/admin/Dockerfile
+      args:
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:4000}
+    restart: unless-stopped
+    ports:
+      - "${ADMIN_PORT:-3000}:3000"
+    depends_on:
+      api:
+        condition: service_healthy
+
+volumes:
+  pgdata:
+  uploads:

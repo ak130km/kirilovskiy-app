@@ -1,0 +1,14 @@
+**/node_modules
+**/dist
+**/.next
+**/.expo
+**/*.tsbuildinfo
+.git
+.env
+.env.*
+!.env.example
+*.log
+apps/api/uploads/*
+# Мобильное приложение не собирается в Docker — нужен только package.json для целостности workspace
+apps/mobile/*
+!apps/mobile/package.json

@@ -1,0 +1,45 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: kirilovskiy
+          POSTGRES_PASSWORD: kirilovskiy
+          POSTGRES_DB: kirilovskiy
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U kirilovskiy" --health-interval 5s --health-timeout 3s --health-retries 20
+    env:
+      DATABASE_URL: postgresql://kirilovskiy:kirilovskiy@localhost:5432/kirilovskiy?schema=public
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: cp .env.example .env
+      - run: pnpm install --frozen-lockfile
+      - name: Миграции и сиды на чистой БД
+        run: pnpm db:deploy && pnpm db:seed
+      - run: pnpm typecheck
+      - run: pnpm test
+      - name: Сборка API и админ-панели
+        run: pnpm build
+      - name: Сборка мобильного приложения (web-бандл)
+        run: pnpm --filter @kirilovskiy/mobile export:web
+
+  docker:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: docker compose build

@@ -17,16 +17,16 @@ const rub = (v: number) => Math.round(v * 100);
 async function seedStaff() {
   const count = await prisma.staffUser.count();
   if (count > 0) return;
-  const email = (process.env.SEED_ADMIN_EMAIL ?? 'admin@kirilovskiy.local').toLowerCase();
+  const email = (process.env.SEED_ADMIN_EMAIL || 'admin@kirilovskiy.local').toLowerCase();
   const generated = !process.env.SEED_ADMIN_PASSWORD;
-  const password = process.env.SEED_ADMIN_PASSWORD ?? randomBytes(9).toString('base64url');
+  const password = process.env.SEED_ADMIN_PASSWORD || randomBytes(9).toString('base64url');
   await prisma.staffUser.create({
     data: { email, name: 'Администратор', role: 'ADMIN', passwordHash: await bcrypt.hash(password, 10) },
   });
   console.log(`👤 Администратор: ${email}${generated ? ` / пароль: ${password} (сохраните и смените)` : ''}`);
 
   if (process.env.SEED_DEMO_DATA !== 'false') {
-    const demoPassword = await bcrypt.hash(process.env.SEED_ADMIN_PASSWORD ?? password, 10);
+    const demoPassword = await bcrypt.hash(password, 10);
     await prisma.staffUser.createMany({
       data: [
         { email: 'manager@kirilovskiy.local', name: 'Мария (менеджер)', role: 'MANAGER', passwordHash: demoPassword },
