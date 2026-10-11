@@ -1,0 +1,41 @@
+# Зависимости и сборка
+node_modules/
+dist/
+build/
+.next/
+out/
+*.tsbuildinfo
+coverage/
+
+# Expo
+.expo/
+web-build/
+apps/mobile/ios/
+apps/mobile/android/
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+*.orig.*
+expo-env.d.ts
+
+# Окружение и секреты
+.env
+.env.*
+!.env.example
+apps/mobile/google-services.json
+apps/mobile/GoogleService-Info.plist
+
+# Загруженные файлы
+apps/api/uploads/*
+!apps/api/uploads/.gitkeep
+
+# Логи и системное
+*.log
+npm-debug.log*
+pnpm-debug.log*
+.DS_Store
+.idea/
+.vscode/*
+!.vscode/extensions.json

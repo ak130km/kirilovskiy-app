@@ -1,0 +1,13 @@
+packages:
+  - apps/*
+  - packages/*
+
+# Пакеты, которым разрешено выполнять install-скрипты (pnpm 10 блокирует их по умолчанию)
+onlyBuiltDependencies:
+  - '@prisma/client'
+  - '@prisma/engines'
+  - '@nestjs/core'
+  - esbuild
+  - prisma
+  - sharp
+  - unrs-resolver

@@ -1,0 +1,26 @@
+{
+  "name": "kirilovskiy-app",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Кондитерская Артёма Кирилловского — мобильное приложение, админ-панель и API",
+  "packageManager": "pnpm@10.28.0",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "postinstall": "pnpm --filter @kirilovskiy/shared build",
+    "build:shared": "pnpm --filter @kirilovskiy/shared build",
+    "dev:api": "pnpm --filter @kirilovskiy/api dev",
+    "dev:admin": "pnpm --filter @kirilovskiy/admin dev",
+    "dev:mobile": "pnpm --filter @kirilovskiy/mobile start",
+    "db:up": "docker compose up -d postgres",
+    "db:migrate": "pnpm --filter @kirilovskiy/api prisma:migrate",
+    "db:seed": "pnpm --filter @kirilovskiy/api db:seed",
+    "db:reset": "pnpm --filter @kirilovskiy/api db:reset",
+    "build": "pnpm -r --filter=!@kirilovskiy/mobile build",
+    "typecheck": "pnpm -r typecheck",
+    "test": "pnpm -r --if-present test",
+    "docker:up": "docker compose up -d --build",
+    "docker:down": "docker compose down"
+  }
+}
